@@ -143,8 +143,8 @@ class MyWindow(QMainWindow):
         shelf_card.inner_layout.addWidget(self.stop_shelf)
 
         dash_card = Card("Dashboards")
-        self.powerbi_btn = QPushButton("Open Power BI")
-        self.grafana_btn = QPushButton("Open Grafana")
+        self.powerbi_btn = QPushButton("History Analysis")
+        self.grafana_btn = QPushButton("Realtime Analysis")
         dash_card.inner_layout.addWidget(self.powerbi_btn)
         dash_card.inner_layout.addWidget(self.grafana_btn)
 
@@ -297,7 +297,21 @@ class MyWindow(QMainWindow):
         webbrowser.open("https://app.powerbi.com/groups/83355bd3-2c2d-49c9-a235-7f30804266aa/reports/068c93cc-1fd7-47e0-aada-0051a8f6d202/ReportSection15dbfb33205b066302e7?experience=power-bi")
 
     def open_grafana(self):
-        webbrowser.open("http://localhost:3000/d/adjqmwc/footfall-analysis-dashboard?orgId=1&from=now-6h&to=now&timezone=browser")
+#        webbrowser.open("http://localhost:3000/d/adjqmwc/footfall-analysis-dashboard?orgId=1&from=now-6h&to=now&timezone=browser")
+        if hasattr(self, "streamlit_process") and self.streamlit_process.poll() is None:
+            webbrowser.open("http://localhost:8501")
+            return
+
+        self.streamlit_process = subprocess.Popen([
+            r"myenv\Scripts\streamlit",
+            "run",
+            "streamlit_app.py",
+            "--server.headless=true"
+        ])
+
+        webbrowser.open("http://localhost:8501")
+        
+    
 
     def closeEvent(self, event):
         if self.cap1.isOpened():
